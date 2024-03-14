@@ -1,4 +1,3 @@
-import time
 import os
 from dotenv import load_dotenv
 from selenium import webdriver
@@ -11,6 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 load_dotenv()
 ru = os.getenv("RU")
 senha = os.getenv("SENHA")
+tempo_padrao = 30
 
 print('1 - FDS')
 print('2 - MAC')
@@ -40,62 +40,59 @@ driver = webdriver.Chrome()
 driver.get("https://univirtus.uninter.com/ava/web/")
 
 # Busca pelo input de RU e insere o seu Registro Uninter.
-WebDriverWait(driver, 10).until(
+WebDriverWait(driver, tempo_padrao).until(
     EC.presence_of_element_located((By.CSS_SELECTOR, "input#ru"))
 ).send_keys(ru)
 
 # Busca pelo input de senha e insere sua senha.
-WebDriverWait(driver, 10).until(
+WebDriverWait(driver, tempo_padrao).until(
     EC.presence_of_element_located((By.CSS_SELECTOR, "input#senha"))
 ).send_keys(senha)
 
 # Clica no botão de login.
-WebDriverWait(driver, 10).until(
+WebDriverWait(driver, tempo_padrao).until(
     EC.presence_of_element_located((By.CSS_SELECTOR, "button#loginBtn"))
 ).click()
 
 # Clica no linnk para o AVA.
-# Tive que esperar 3 segundos pois existe um animação no elemento que as vezes dava um erro na busca do elemento.
-time.sleep(3)
-WebDriverWait(driver, 10).until(
-    EC.presence_of_element_located((By.CSS_SELECTOR, "a#loginBoxAva"))
+WebDriverWait(driver, tempo_padrao).until(
+    EC.element_to_be_clickable((By.CSS_SELECTOR, "a#loginBoxAva"))
 ).click()
 
 # Trata as notificações que aparecem quando logamos.
-button_fechar_modal = WebDriverWait(driver, 30).until(
-    EC.presence_of_element_located((By.CSS_SELECTOR, 'button#fecharModalPopup'))
+button_fechar_modal = WebDriverWait(driver, tempo_padrao).until(
+    EC.element_to_be_clickable((By.CSS_SELECTOR, 'button#fecharModalPopup'))
 )
 while button_fechar_modal is not None:
     button_fechar_modal.click()
-    driver.refresh()
     try:
-        button_fechar_modal = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, 'button#fecharModalPopup'))
+        button_fechar_modal = WebDriverWait(driver, tempo_padrao / 3).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, 'button#fecharModalPopup'))
         )
     except TimeoutException:
         button_fechar_modal = None
 
 # Seleciona o curo de ADS.
-cursos = WebDriverWait(driver, 30).until(
+cursos = WebDriverWait(driver, tempo_padrao).until(
     EC.presence_of_all_elements_located((By.CLASS_NAME, "link-curso"))
 )
 curso_ads = list(filter(filtrar_curso, cursos))
 curso_ads[0].click()
 
 # Seleciona a disciplina que irá arcar presença.
-disciplinas = WebDriverWait(driver, 30).until(
+disciplinas = WebDriverWait(driver, tempo_padrao).until(
     EC.presence_of_all_elements_located((By.CLASS_NAME, "link-disciplina"))
 )
 disciplina = list(filter(filtrar_disciplina, disciplinas))
 disciplina[0].click()
 
 # Clica no botão de frequencia.
-WebDriverWait(driver, 30).until(
+WebDriverWait(driver, tempo_padrao).until(
     EC.presence_of_element_located((By.CSS_SELECTOR, "a#diarioClasseFrequenciaAluno>span"))
 ).click()
 
 # Marca presença.
-WebDriverWait(driver, 30).until(
+WebDriverWait(driver, tempo_padrao).until(
     EC.presence_of_element_located((By.CSS_SELECTOR, "button#marcarPresenca"))
 ).click()
 
