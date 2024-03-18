@@ -2,7 +2,6 @@ import os
 from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -59,18 +58,8 @@ WebDriverWait(driver, tempo_padrao).until(
     EC.element_to_be_clickable((By.CSS_SELECTOR, "a#loginBoxAva"))
 ).click()
 
-# Trata as notificações que aparecem quando logamos.
-button_fechar_modal = WebDriverWait(driver, tempo_padrao).until(
-    EC.element_to_be_clickable((By.CSS_SELECTOR, 'button#fecharModalPopup'))
-)
-while button_fechar_modal is not None:
-    button_fechar_modal.click()
-    try:
-        button_fechar_modal = WebDriverWait(driver, tempo_padrao / 3).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, 'button#fecharModalPopup'))
-        )
-    except TimeoutException:
-        button_fechar_modal = None
+# Retirei a parte do script que trata das notificações. Recarregar a pagina também resolve.
+driver.refresh()
 
 # Seleciona o curo de ADS.
 cursos = WebDriverWait(driver, tempo_padrao).until(
@@ -98,4 +87,4 @@ WebDriverWait(driver, tempo_padrao).until(
 
 driver.quit()
 
-print("Presença comfirmada")
+print("Presença confirmada")
